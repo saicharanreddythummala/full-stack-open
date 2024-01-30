@@ -1,63 +1,79 @@
-const App = () => {
-  const course = {
-    name: 'Half Stack application development',
-    parts: [
-      {
-        name: 'Fundamentals of React',
-        exercises: 10
-      },
-      {
-        name: 'Using props to pass data',
-        exercises: 7
-      },
-      {
-        name: 'State of a component',
-        exercises: 14
-      }
-    ]
+import { useState } from 'react'
+
+const Button = ({ onPress, displayText }) => (
+  <button onClick={onPress}>{displayText}</button>
+)
+
+const Statistics = ({ good, neutral, bad, totalFeedback, avg, positivePercentage }) => {
+
+  {
+    if (totalFeedback > 0) {
+      return (<>
+        <StatisticsLine text={"good"} value={good} />
+        <StatisticsLine text={"neutral"} value={neutral} />
+        <StatisticsLine text={"bad"} value={bad} />
+        <StatisticsLine text={"all"} value={totalFeedback} />
+        <StatisticsLine text={"average"} value={avg} />
+        <StatisticsLine text={"positive"} value={positivePercentage} /></>)
+    }
+
+    return (
+      <>
+        <tr><td><p>No feedback given</p></td></tr>
+      </>
+    )
   }
+
+}
+
+const StatisticsLine = ({ text, value }) => (
+  <>
+    <tr>
+      <td>
+        <p>{text}</p>
+      </td>
+      <td>
+        <p>{value}</p>
+      </td>
+    </tr>
+  </>
+)
+
+
+const App = () => {
+  // save clicks of each button to its own state
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
+  let totalFeedback = good + neutral + bad;
+  let avg = ((good + (neutral * 0) + (bad * -1)) / totalFeedback).toFixed(1);
+  let positivePercentage = ((good / totalFeedback) * 100 ).toFixed(1) + '%';
+
+  const handleSetGood = () => {
+    setGood(good + 1)
+  }
+  const handleSetBad = () => {
+    setBad(bad + 1)
+  }
+  const handleSetNeutral = () => {
+    setNeutral(neutral + 1)
+  }
+
+
   return (
     <div>
-      <Header course={course.name} />
-      <Content parts={course.parts}/>
-      <Total  parts={course.parts} />
+      <h1>give feedback</h1>
+      <Button onPress={handleSetGood} displayText={'good'} />
+      <Button onPress={handleSetNeutral} displayText={'neutral'} />
+      <Button onPress={handleSetBad} displayText={'bad'} />
+
+      <h1>statistics</h1>
+      <table>
+        <tbody>
+          <Statistics good={good} neutral={neutral} bad={bad} totalFeedback={totalFeedback} avg={avg} positivePercentage={positivePercentage} />
+        </tbody>
+      </table>
     </div>
-  )
-}
-
-const Header = (props) => {
-  return (
-    <>
-      <h1>
-        {props.course}
-      </h1>
-    </>
-  )
-}
-
-const Content = (props) => {
-  return (
-    <>
-      <Part part={props.parts[0].name} exercise={props.parts[0].exercises} />
-      <Part part={props.parts[1].name} exercise={props.parts[1].exercises} />
-      <Part part={props.parts[2].name} exercise={props.parts[2].exercises} />
-    </>
-  )
-}
-
-const Total = (props) => {
-  return (
-    <>
-      <p>Number of exercises {props.parts[0].exercises + props.parts[1].exercises + props.parts[2].exercises}</p>
-    </>
-  )
-}
-
-const Part = (props) => {
-  return (
-    <p>
-      {props.part} {props.exercise}
-    </p>
   )
 }
 
