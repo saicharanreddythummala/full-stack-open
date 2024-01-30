@@ -1,79 +1,65 @@
 import { useState } from 'react'
 
-const Button = ({ onPress, displayText }) => (
-  <button onClick={onPress}>{displayText}</button>
-)
-
-const Statistics = ({ good, neutral, bad, totalFeedback, avg, positivePercentage }) => {
-
-  {
-    if (totalFeedback > 0) {
-      return (<>
-        <StatisticsLine text={"good"} value={good} />
-        <StatisticsLine text={"neutral"} value={neutral} />
-        <StatisticsLine text={"bad"} value={bad} />
-        <StatisticsLine text={"all"} value={totalFeedback} />
-        <StatisticsLine text={"average"} value={avg} />
-        <StatisticsLine text={"positive"} value={positivePercentage} /></>)
-    }
-
-    return (
-      <>
-        <tr><td><p>No feedback given</p></td></tr>
-      </>
-    )
-  }
-
+const Anectode = ({heading, anectode, votes})=>{
+  return (
+   <>
+    <h1>{heading}</h1>
+    <p>{anectode}</p>
+    <p>has {votes} votes</p>
+   </>
+  )
 }
-
-const StatisticsLine = ({ text, value }) => (
-  <>
-    <tr>
-      <td>
-        <p>{text}</p>
-      </td>
-      <td>
-        <p>{value}</p>
-      </td>
-    </tr>
-  </>
-)
 
 
 const App = () => {
-  // save clicks of each button to its own state
-  const [good, setGood] = useState(0)
-  const [neutral, setNeutral] = useState(0)
-  const [bad, setBad] = useState(0)
-  let totalFeedback = good + neutral + bad;
-  let avg = ((good + (neutral * 0) + (bad * -1)) / totalFeedback).toFixed(1);
-  let positivePercentage = ((good / totalFeedback) * 100 ).toFixed(1) + '%';
+  const anecdotes = [
+    'If it hurts, do it more often.',
+    'Adding manpower to a late software project makes it later!',
+    'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
+    'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
+    'Premature optimization is the root of all evil.',
+    'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.',
+    'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.',
+    'The only way to go fast, is to go well.'
+  ]
+   
+  const votes = new Uint8Array(anecdotes.length); 
+  const [selected, setSelected] = useState(0);
+  const [votesArr, setVotesArr] = useState(votes);
+  const [mostVotes, setMostVotes] = useState(0);
 
-  const handleSetGood = () => {
-    setGood(good + 1)
-  }
-  const handleSetBad = () => {
-    setBad(bad + 1)
-  }
-  const handleSetNeutral = () => {
-    setNeutral(neutral + 1)
+  const nextAnectode = ()=>{
+    const randIndex = Math.floor(Math.random() * anecdotes.length)
+    setSelected(randIndex);
   }
 
+  const vote = ()=>{
+    let votesCopy = [...votesArr]
+    votesCopy[selected] += 1;
+    setVotesArr(votesCopy);
+    const mostVotedIndex = findMostVotedIndex(votesCopy);
+    setMostVotes(mostVotedIndex)
+  }
+
+  const findMostVotedIndex = votesCopy => {
+    let maxIndex = 0;
+    votesCopy.forEach((vote, index) => {
+      if (vote > votesCopy[maxIndex]) {
+        maxIndex = index;
+      }
+    });
+    return maxIndex;
+  };
 
   return (
+   <>
+    <Anectode heading={`Anectode of the day`} anectode={anecdotes[selected]} votes={votesArr[selected]}/>
     <div>
-      <h1>give feedback</h1>
-      <Button onPress={handleSetGood} displayText={'good'} />
-      <Button onPress={handleSetNeutral} displayText={'neutral'} />
-      <Button onPress={handleSetBad} displayText={'bad'} />
-
-      <h1>statistics</h1>
-      <table>
-        <tbody>
-          <Statistics good={good} neutral={neutral} bad={bad} totalFeedback={totalFeedback} avg={avg} positivePercentage={positivePercentage} />
-        </tbody>
-      </table>
+      <button onClick={vote}>vote</button>
+      <button onClick={nextAnectode}>next annectode</button>
     </div>
+    <Anectode heading={`Anectode with most votes`} anectode={anecdotes[mostVotes]} votes={votesArr[mostVotes]}/>
+   </>
   )
 }
 
